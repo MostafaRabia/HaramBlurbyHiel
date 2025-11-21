@@ -37,10 +37,13 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../haramblur-release-key.keystore")
-            storePassword = "haramblur123"
-            keyAlias = "haramblur"
-            keyPassword = "haramblur123"
+            val keystoreFile = file("../haramblur-release-key.keystore")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = "haramblur123"
+                keyAlias = "haramblur"
+                keyPassword = "haramblur123"
+            }
         }
     }
 
@@ -48,7 +51,13 @@ android {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
-            signingConfig = signingConfigs.getByName("release")
+            // Use release signing if keystore exists, otherwise fall back to debug signing
+            val keystoreFile = file("../haramblur-release-key.keystore")
+            signingConfig = if (keystoreFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
