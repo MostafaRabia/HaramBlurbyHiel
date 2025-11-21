@@ -45,9 +45,17 @@ android {
                 storeFile = keystoreFile
                 // Use environment variables for credentials (recommended for CI/CD and security)
                 // For local builds, set these in gradle.properties or as environment variables
-                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD") as String? ?: ""
-                keyAlias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS") as String? ?: ""
-                keyPassword = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD") as String? ?: ""
+                val storePass = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD") as String?
+                val alias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS") as String?
+                val keyPass = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD") as String?
+                
+                if (storePass != null && alias != null && keyPass != null) {
+                    storePassword = storePass
+                    keyAlias = alias
+                    keyPassword = keyPass
+                } else {
+                    logger.warn("⚠️ Keystore credentials not found. Set KEYSTORE_PASSWORD, KEY_ALIAS, and KEY_PASSWORD in environment or gradle.properties")
+                }
             }
         }
     }
