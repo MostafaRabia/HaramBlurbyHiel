@@ -35,14 +35,18 @@ android {
         }
     }
 
+    // Keystore configuration - extracted to avoid duplication
+    val keystoreFile = file("../haramblur-release-key.keystore")
+    val keystoreExists = keystoreFile.exists()
+
     signingConfigs {
         create("release") {
-            val keystoreFile = file("../haramblur-release-key.keystore")
-            if (keystoreFile.exists()) {
+            if (keystoreExists) {
                 storeFile = keystoreFile
-                storePassword = "haramblur123"
-                keyAlias = "haramblur"
-                keyPassword = "haramblur123"
+                // Use environment variables if available, otherwise fall back to properties
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "haramblur123"
+                keyAlias = System.getenv("KEY_ALIAS") ?: "haramblur"
+                keyPassword = System.getenv("KEY_PASSWORD") ?: "haramblur123"
             }
         }
     }
@@ -52,8 +56,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             // Use release signing if keystore exists, otherwise fall back to debug signing
-            val keystoreFile = file("../haramblur-release-key.keystore")
-            signingConfig = if (keystoreFile.exists()) {
+            signingConfig = if (keystoreExists) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
