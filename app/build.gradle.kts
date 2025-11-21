@@ -35,12 +35,28 @@ android {
         }
     }
 
+    // Keystore configuration - extracted to avoid duplication
+    val keystoreFile = file("../haramblur-release-key.keystore")
+    val keystoreExists = keystoreFile.exists()
+
     signingConfigs {
         create("release") {
-            storeFile = file("../haramblur-release-key.keystore")
-            storePassword = "haramblur123"
-            keyAlias = "haramblur"
-            keyPassword = "haramblur123"
+            if (keystoreExists) {
+                storeFile = keystoreFile
+                // Use environment variables for credentials (recommended for CI/CD and security)
+                // For local builds, set these in gradle.properties or as environment variables
+                val storePass = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD") as String?
+                val alias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS") as String?
+                val keyPass = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD") as String?
+                
+                if (storePass != null && alias != null && keyPass != null) {
+                    storePassword = storePass
+                    keyAlias = alias
+                    keyPassword = keyPass
+                } else {
+                    logger.warn("⚠️ Keystore credentials not found. Set KEYSTORE_PASSWORD, KEY_ALIAS, and KEY_PASSWORD in environment or gradle.properties")
+                }
+            }
         }
     }
 
@@ -48,7 +64,12 @@ android {
         release {
             isMinifyEnabled = false
             isShrinkResources = false
-            signingConfig = signingConfigs.getByName("release")
+            // Use release signing if keystore exists, otherwise fall back to debug signing
+            signingConfig = if (keystoreExists) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

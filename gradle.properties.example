@@ -1,0 +1,12 @@
+# Example gradle.properties for local development
+# Copy this file to gradle.properties and fill in your actual values
+# DO NOT commit gradle.properties with real credentials to version control
+
+# Keystore credentials for release builds
+# These should match your keystore configuration
+KEYSTORE_PASSWORD=your_keystore_password_here
+KEY_ALIAS=your_key_alias_here
+KEY_PASSWORD=your_key_password_here
+
+# Note: In CI/CD environments, use GitHub Secrets or environment variables instead
+# The build.gradle.kts file will first check environment variables, then gradle.properties
