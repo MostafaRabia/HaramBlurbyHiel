@@ -67,15 +67,28 @@ After the build completes:
 
 ## إعداد التوقيع للإصدار | Release Signing Setup
 
-### الطريقة 1: إضافة Keystore للمستودع (غير موصى به)
+⚠️ **تحذير أمني | Security Warning**: لا تضع كلمات المرور في ملفات المشروع أو تدفعها إلى Git!
+Never commit passwords in project files or push them to Git!
+
+### الطريقة 1: الإعداد المحلي | Local Setup (For Development)
+
 ```bash
-# ضع ملف keystore في جذر المشروع
+# نسخ ملف المثال
+cp gradle.properties.example gradle.properties
+
+# تحرير الملف وإضافة بياناتك الحقيقية
+# Edit the file and add your real credentials
+nano gradle.properties
+
+# إضافة الـ Keystore (لن يتم دفعه للـ Git)
+# Add the keystore (won't be pushed to Git)
 cp your-keystore.keystore haramblur-release-key.keystore
-git add haramblur-release-key.keystore
-git commit -m "Add release keystore"
 ```
 
-### الطريقة 2: استخدام GitHub Secrets (موصى به)
+**ملاحظة**: ملفات `gradle.properties` و `haramblur-release-key.keystore` محلية فقط ولن تُدفع إلى Git.
+**Note**: Files `gradle.properties` and `haramblur-release-key.keystore` are local only and won't be pushed to Git.
+
+### الطريقة 2: استخدام GitHub Secrets (موصى به للـ CI/CD)
 
 #### الخطوة 1: تشفير الـ Keystore
 ```bash

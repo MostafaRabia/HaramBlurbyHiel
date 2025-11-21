@@ -43,10 +43,11 @@ android {
         create("release") {
             if (keystoreExists) {
                 storeFile = keystoreFile
-                // Use environment variables if available, otherwise fall back to properties
-                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "haramblur123"
-                keyAlias = System.getenv("KEY_ALIAS") ?: "haramblur"
-                keyPassword = System.getenv("KEY_PASSWORD") ?: "haramblur123"
+                // Use environment variables for credentials (recommended for CI/CD and security)
+                // For local builds, set these in gradle.properties or as environment variables
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("KEYSTORE_PASSWORD") as String? ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: project.findProperty("KEY_ALIAS") as String? ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: project.findProperty("KEY_PASSWORD") as String? ?: ""
             }
         }
     }
